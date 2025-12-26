@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Book, BorrowRecord
 from .serializers import BookSerializer, BorrowRecordSerializer
@@ -51,6 +52,8 @@ class BorrowRecordListView(generics.ListAPIView):
     queryset = BorrowRecord.objects.all()
     serializer_class = BorrowRecordSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
+    pagination_class = LMSResultsSetPagination
+
 
 class MemberBorrowHistoryView(generics.ListAPIView):
     """
@@ -58,11 +61,19 @@ class MemberBorrowHistoryView(generics.ListAPIView):
     """
     serializer_class = BorrowRecordSerializer
     permission_classes = [IsAuthenticated, IsMember]
+    pagination_class = LMSResultsSetPagination
 
     def get_queryset(self):
         return BorrowRecord.objects.filter(member=self.request.user)
     
 class BookListCreateView(generics.ListCreateAPIView):
     queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    pagination_class = LMSResultsSetPagination
+
+
+
+class BookListView(ListAPIView):
+    queryset = Book.objects.all().order_by('id')
     serializer_class = BookSerializer
     pagination_class = LMSResultsSetPagination
