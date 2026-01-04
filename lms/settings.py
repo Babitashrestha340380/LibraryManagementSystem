@@ -39,7 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'base',
     'rest_framework',
+    'django_filters',
+    'drf_yasg',
+    'rest_framework.authtoken',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -60,6 +65,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -138,4 +144,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 15,  # good default for LMS
     'MAX_PAGE_SIZE': 50,  # limit to avoid too large responses
+
+    'DEFAULT_AUTHENTICATION_CLASS':[
+        'rest_framework.authentication.TokenAuthentication',
+    ]
 }
+

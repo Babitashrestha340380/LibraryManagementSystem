@@ -75,7 +75,7 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BorrowRecord
-        fields = ['id', 'book', 'book_id', 'member', 'borrowed_date', 'due_date', 'returned_date', 'status']
+        fields = ['id', 'book', 'book_id', 'member', 'issue_date', 'due_date', 'return_date']
 
     def create(self, validated_data):
         request = self.context['request']
@@ -96,8 +96,8 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # If returning book, increase available copies
-        returned_date = validated_data.get('returned_date', None)
-        if returned_date and not instance.returned_date:
+        return_date = validated_data.get('return_date', None)
+        if return_date and not instance.returned_date:
             instance.book.available_copies += 1
             instance.book.save()
 

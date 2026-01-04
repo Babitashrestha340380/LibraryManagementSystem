@@ -12,4 +12,4 @@ class IsMember(BasePermission):
     Allows access only to non-admin authenticated users.
     """
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and not request.user.is_staff)
+        return bool(request.user and request.user.is_authenticated and not request.user.is_notstaff)

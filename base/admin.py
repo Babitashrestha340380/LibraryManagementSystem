@@ -44,6 +44,6 @@ class MemberAdmin(admin.ModelAdmin):
 @admin.register(BorrowRecord)
 class BorrowRecordAdmin(admin.ModelAdmin):
     list_display = ('id', 'book', 'member', 'issue_date', 'due_date', 'return_date', 'is_overdue')
-    list_filter = ('issue_date', 'due_date', 'return_date')
+    list_filter = ( 'due_date','member')
     search_fields = ('book__title', 'member__user__username')
     readonly_fields = ('is_overdue',)
