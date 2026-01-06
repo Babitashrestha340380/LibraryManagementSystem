@@ -1,7 +1,9 @@
 # library/views.py
 from rest_framework import generics
+from .permissions import IsAdmin, IsMember
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from .models import Book, BorrowRecord
@@ -88,7 +90,7 @@ class BorrowRecordListView(generics.ListAPIView):
     filterset_class = BorrowRecordFilter
     search_fields = ['member__username', 'book__title']
 
-class MemberBorrowHistoryView(generics.ListAPIView):
+'''class MemberBorrowHistoryView(generics.ListAPIView):
     """
     GET /my-borrow-history/:
         - List borrowing history for the logged-in member
@@ -97,20 +99,38 @@ class MemberBorrowHistoryView(generics.ListAPIView):
         - Member only
     """
     serializer_class = BorrowRecordSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsMember]
     pagination_class = LMSResultsSetPagination
 
     def get_queryset(self):
-        # Only non-staff users can access
-        if self.request.user.is_staff:
+        # Return BorrowRecords for the logged-in member
+        return BorrowRecord.objects.filter(
+            member=self.request.user.member
+        ).order_by('-issue_date')'''
+
+class MemberBorrowHistoryView(generics.ListAPIView):
+    """
+    GET /my-borrow-history/:
+        - Returns borrowing history for the logged-in member
+        - Pagination supported
+        - Member-only access
+    """
+    serializer_class = BorrowRecordSerializer
+    permission_classes = [IsAuthenticated, IsMember]
+    authentication_classes = [TokenAuthentication]
+    pagination_class = LMSResultsSetPagination
+
+    @swagger_auto_schema(operation_summary="Member Borrow History")
+    def get_queryset(self):
+        user = self.request.user
+
+        # Ensure only members access this endpoint
+        if user.is_staff:
             raise PermissionDenied("Librarians cannot access this endpoint.")
 
-        # Safely get the Member instance
-        try:
-            member = self.request.user.member
-        except Member.DoesNotExist:
+        # Ensure member profile exists (should always exist with signals)
+        if not hasattr(user, "member"):
             raise PermissionDenied("This user has no member profile.")
 
-        return BorrowRecord.objects.filter(member=member).order_by('-issue_date')
-    
-    
+        # Return borrow records for the logged-in member, newest first
+        return BorrowRecord.objects.filter(member=user.member).order_by('-issue_date')

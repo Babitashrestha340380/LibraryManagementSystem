@@ -129,24 +129,36 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Enter token as: Token <your_token>',
+        }
+    },
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg.inspectors.SwaggerAutoSchema',
+    'USE_SESSION_AUTH': False,
+    'SECURITY': [{'Token': ['Token 6e27cfcbbcaa5898c064317b12d87c8a817eda23']}],  # <-- default token
+}
+
+
+
+
+
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',  # For browser login
-        'rest_framework.authentication.BasicAuthentication',    # For API testing
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # All endpoints require login by default
-    ]
-}
-
-
-REST_FRAMEWORK = {
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 15,  # good default for LMS
-    'MAX_PAGE_SIZE': 50,  # limit to avoid too large responses
-
-    'DEFAULT_AUTHENTICATION_CLASS':[
-        'rest_framework.authentication.TokenAuthentication',
-    ]
+    'PAGE_SIZE': 15,
+    'MAX_PAGE_SIZE': 50,
 }
-

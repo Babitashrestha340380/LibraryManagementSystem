@@ -82,7 +82,8 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
         user = request.user
 
         # Assign member
-        validated_data['member'] = user
+        validated_data['member'] = user.member
+
 
         # Decrease available copies
         book = validated_data['book']
@@ -97,7 +98,8 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         # If returning book, increase available copies
         return_date = validated_data.get('return_date', None)
-        if return_date and not instance.returned_date:
+        if return_date and not instance.return_date:
+
             instance.book.available_copies += 1
             instance.book.save()
 
